@@ -1,0 +1,243 @@
+---
+title: "DMC Training Data Pre-Study"
+author: "Xingche Guo"
+date: "4/8/2019"
+output: pdf_document
+---
+
+```{r    echo = FALSE}
+
+library(ggplot2)
+library(gridExtra)
+
+Train <- read.csv(file = "/Users/apple/Desktop/ISU 2019 spring/DMC2019/DMC_2019_task/train.csv",
+                  sep = "|")
+
+names(Train)
+Train$trustLevel <- as.factor(Train$trustLevel)
+Train$fraud <- as.factor(Train$fraud)
+```
+
+
+
+# trustLevel vs fraud
+```{r   echo = FALSE}
+## trustLevel vs fraud
+t( table(Train$trustLevel, Train$fraud) )
+
+Train_reduce <- Train[(as.numeric(Train$trustLevel)==1)
+                    | (as.numeric(Train$trustLevel)==2) , ]
+```
+
+
+
+
+# totalScanTimeInSeconds vs fraud
+```{r   fig.height=5, fig.width=7, echo = FALSE}
+p1<-ggplot(data = Train) + 
+  geom_boxplot(aes(x= fraud, y=totalScanTimeInSeconds))+ 
+  ggtitle("All Trust Levels")
+
+p2<-ggplot(data = Train_reduce) + 
+  geom_boxplot(aes(x= fraud, y=totalScanTimeInSeconds))+ 
+  ggtitle("Trust Levels 1 & 2")
+
+p3<-ggplot(data = Train) + 
+  geom_density(aes(x=totalScanTimeInSeconds, 
+                   y=..density.., fill = fraud), alpha = 0.3)+ 
+  ggtitle("All Trust Levels")
+
+p4<-ggplot(data = Train_reduce) + 
+  geom_density(aes(x=totalScanTimeInSeconds, 
+                   y=..density.., fill = fraud), alpha = 0.3)+ 
+  ggtitle("Trust Levels 1 & 2")
+
+grid.arrange(p1,p2,p3,p4,ncol=2)
+```
+
+
+
+
+
+# grandTotal vs fraud
+```{r    fig.height=5, fig.width=7, echo = FALSE}
+p5<-ggplot(data = Train) + 
+  geom_boxplot(aes(x=fraud, y=grandTotal))+ 
+  ggtitle("All Trust Levels")
+
+p6<-ggplot(data = Train_reduce) + 
+  geom_boxplot(aes(x=fraud, y=grandTotal))+ 
+  ggtitle("Trust Levels 1 & 2")
+
+p7<-ggplot(data = Train) + 
+  geom_density(aes(x=grandTotal, 
+                   y=..density.., fill = fraud), alpha = 0.3)+ 
+  ggtitle("All Trust Levels")
+
+p8<-ggplot(data = Train_reduce) + 
+  geom_density(aes(x=grandTotal, 
+                   y=..density.., fill = fraud), alpha = 0.3)+ 
+  ggtitle("Trust Levels 1 & 2")
+
+grid.arrange(p5,p6,p7,p8,ncol=2)
+```
+
+
+
+
+
+# lineItemVoids vs fraud
+```{r     fig.height=2.5, fig.width=7, echo = FALSE}
+p9<-ggplot(data = Train) + 
+  geom_boxplot(aes(x=fraud, y=lineItemVoids))+ 
+  ggtitle("All Trust Levels")
+
+p10<-ggplot(data = Train_reduce) + 
+  geom_boxplot(aes(x=fraud, y=lineItemVoids))+ 
+  ggtitle("Trust Levels 1 & 2")
+
+grid.arrange(p9,p10,ncol=2)
+
+cat("All Trust Levels\n")
+t( table(Train$lineItemVoids, Train$fraud) )
+cat("Trust Levels 1 & 2\n")
+t( table(Train_reduce$lineItemVoids, Train_reduce$fraud) )
+```
+
+
+
+
+
+# scansWithoutRegistration vs fraud
+```{r     fig.height=2.5, fig.width=7, echo = FALSE}
+p11<-ggplot(data = Train) + 
+  geom_boxplot(aes(x=fraud, y=scansWithoutRegistration))+ 
+  ggtitle("All Trust Levels")
+
+p12<-ggplot(data = Train_reduce) + 
+  geom_boxplot(aes(x=fraud, y=scansWithoutRegistration))+ 
+  ggtitle("Trust Levels 1 & 2")
+
+grid.arrange(p11,p12,ncol=2)
+
+cat("All Trust Levels\n")
+t( table(Train$scansWithoutRegistration, Train$fraud) )
+cat("Trust Levels 1 & 2\n")
+t( table(Train_reduce$scansWithoutRegistration, Train_reduce$fraud) )
+```
+
+
+
+
+# quantityModifications vs fraud
+```{r     echo = FALSE}
+cat("All Trust Levels\n")
+t( table(Train$quantityModifications, Train$fraud) )
+cat("Trust Levels 1 & 2\n")
+t( table(Train_reduce$quantityModifications, Train_reduce$fraud) )
+```
+
+
+
+
+# scannedLineItemsPerSecond vs fraud
+```{r    fig.height=2.5, fig.width=7, echo = FALSE}
+p13<-ggplot(data = Train) + 
+  geom_density(aes(x=log(scannedLineItemsPerSecond), 
+                   y=..density.., fill = fraud), alpha = 0.3)+ 
+  ggtitle("All Trust Levels")
+
+p14<-ggplot(data = Train_reduce) + 
+  geom_density(aes(x=log(scannedLineItemsPerSecond), 
+                   y=..density.., fill = fraud), alpha = 0.3)+ 
+  ggtitle("Trust Levels 1 & 2")
+
+grid.arrange(p13,p14,ncol=2)
+```
+
+
+
+
+# valuePerSecond vs fraud
+```{r    fig.height=2.5, fig.width=7, echo = FALSE}
+p15<-ggplot(data = Train) + 
+  geom_density(aes(x= log(valuePerSecond), 
+                   y=..density.., fill = fraud), alpha = 0.3)+ 
+  ggtitle("All Trust Levels")
+
+p16<-ggplot(data = Train_reduce) + 
+  geom_density(aes(x= log(valuePerSecond), 
+                   y=..density.., fill = fraud), alpha = 0.3)+ 
+  ggtitle("Trust Levels 1 & 2")
+
+grid.arrange(p15,p16,ncol=2)
+```
+
+
+# lineItemVoidsPerPosition vs fraud
+```{r      fig.height=2.5, fig.width=7, echo = FALSE}
+p17<-ggplot(data = Train) + 
+  geom_density(aes(x= log(lineItemVoidsPerPosition + 0.5), 
+                   y=..density.., fill = fraud), alpha = 0.3)+ 
+  ggtitle("All Trust Levels")
+
+
+p18<-ggplot(data = Train_reduce) + 
+  geom_density(aes(x= log(lineItemVoidsPerPosition + 0.5), 
+                   y=..density.., fill = fraud), alpha = 0.3)+ 
+  ggtitle("Trust Levels 1 & 2")
+
+grid.arrange(p17,p18,ncol=2)
+```
+
+
+
+# total value (Manually Added)
+```{r      fig.height=2.5, fig.width=7, echo = FALSE}
+p19<-ggplot(data = data.frame(totalValue = Train$totalScanTimeInSeconds * Train$valuePerSecond, 
+                         fraud = Train$fraud)) + 
+  geom_density(aes(x= totalValue, y=..density.., fill = fraud), alpha = 0.3)+ 
+  ggtitle("All Trust Levels")
+
+
+p20<-ggplot(data = data.frame(totalValue = Train_reduce$totalScanTimeInSeconds * Train_reduce$valuePerSecond, 
+                         fraud = Train_reduce$fraud)) + 
+  geom_density(aes(x= totalValue, y=..density.., fill = fraud), alpha = 0.3)+ 
+  ggtitle("Trust Levels 1 & 2")
+
+
+grid.arrange(p19,p20,ncol=2)
+```
+
+
+
+
+
+# total item (Manually Added)
+```{r      fig.height=2.5, fig.width=7, echo = FALSE}
+p21<-ggplot(data = data.frame(totalItem = Train$totalScanTimeInSeconds * Train$scannedLineItemsPerSecond, 
+                         fraud = Train$fraud)) + 
+  geom_density(aes(x= totalItem, y=..density.., fill = fraud), alpha = 0.3) + 
+  ggtitle("All Trust Levels")
+
+
+p22<-ggplot(data = data.frame(totalItem = Train_reduce$totalScanTimeInSeconds * Train_reduce$scannedLineItemsPerSecond, 
+                         fraud = Train_reduce$fraud)) + 
+  geom_density(aes(x= totalItem, y=..density.., fill = fraud), alpha = 0.3)+ 
+  ggtitle("Trust Levels 1 & 2")
+
+
+grid.arrange(p21,p22,ncol=2)
+```
+
+
+
+
+
+
+
+
+
+
+
+
