@@ -8,3 +8,4 @@
 - git branch --set-upstream-to=origin/dev dev
 - git pull
 to merge the remote "dev" with your local "dev".
+5. You may want to work on your own branch. When you are done, merge your branch to "dev".
