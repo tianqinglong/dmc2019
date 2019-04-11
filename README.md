@@ -6,6 +6,7 @@
 ### Before You Start
 
 1. Clone the Repo: git clone git@github.com:tianqinglong/dmc2019.git
+or you could try:   git clone https://github.com/tianqinglong/dmc2019.git
 
 2. Now you will only see the master branch. So you will need to create the local "dev" branch by: 
 
