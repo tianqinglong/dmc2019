@@ -27,11 +27,11 @@ eval_loss <- function(preds,truth){
   return(list(metric = "error", value = loss))
 }
 
-CV.xgb <- function(xg.dat,nfold){
+CV.xgb <- function(xg.dat,nfold,thres){
   Nobs = length(xg.dat$label)
   fsize = floor(Nobs/nfold)
   ind.all = sample(1:Nobs,size = Nobs,replace = FALSE)
-  Pred.all = numeric(length = Nobs)
+  Prob.all = numeric(length = Nobs)
   for (i in 1:nfold){
     if (i < nfold){
       ind.test = ind.all[(1:fsize)+(i-1)*fsize]
@@ -43,17 +43,21 @@ CV.xgb <- function(xg.dat,nfold){
     test.foldi = list(data = as.matrix(xg.dat$dat[ind.test,]), 
                     label = xg.dat$label[ind.test])
     bst.foldi = xgboost(data = train.foldi$data,label = train.foldi$label,
-                      max_depth = 5,nrounds = 3,objective = 'binary:logistic')
+                      max_depth = 5,nrounds = 20,objective = 'binary:logistic')
     pred.foldi = predict(bst.foldi,test.foldi$data)
-    Pred.all[ind.test] = pred.foldi
+    Prob.all[ind.test] = pred.foldi
   }
-  return(Pred.all)
+  Pred.all = as.numeric(Prob.all>thres)
+  loss_01 = sum(Pred.all != xg.dat$label)   # 0-1 loss
+  loss_fraud = eval_loss(Pred.all,xg.dat$label)
+  return(list(Prob.all=Prob.all,Pred.all=Pred.all,loss_01=loss_01,loss_fraud=loss_fraud))
 }
 
-CV.prob = CV.xgb(train.xg,5)
+
 thres = 5/7
-CV.pred = as.numeric(CV.prob>thres)
-sum(CV.pred != train.xg$label)   # 0-1 loss
-eval_loss(CV.pred,train.xg$label)
+CV.fit= CV.xgb(train.xg,10,thres)
+CV.fit$loss_fraud
+CV.fit$loss_01
 
-
+rep.cv = replicate(100,CV.xgb(xg.dat=train.xg,nfold=10,thres=5/7))
+mean(unlist(rep.cv[3,]))
