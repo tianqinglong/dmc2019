@@ -1,17 +1,17 @@
 library(ggplot2)
 
-Train <- read.csv(file = "/Users/apple/Desktop/ISU 2019 spring/DMC2019/DMC_2019_task/train.csv",
+Train0 <- read.csv(file = "/Users/apple/Desktop/ISU 2019 spring/DMC2019/DMC_2019_task/train.csv",
                   sep = "|")
 
-names(Train)
+names(Train0)
 
-Train$trustLevel <- as.factor(Train$trustLevel)
-TotalItem <- Train$totalScanTimeInSeconds * Train$scannedLineItemsPerSecond
-AveValue <- Train$grandTotal / TotalItem
+Train0$trustLevel <- as.factor(Train0$trustLevel)
+TotalItem <- Train0$totalScanTimeInSeconds * Train0$scannedLineItemsPerSecond
+AveValue <- Train0$grandTotal / TotalItem
 
 
 
-Train1 <- data.frame(Train, TotalItem = TotalItem)
+Train1 <- data.frame(Train0, TotalItem = TotalItem)
 
 
 
@@ -78,7 +78,7 @@ cv_logistic_probs <- function(D,formula, fold = 10){
 ################################## Loss results #################################
 
 ######## all 0 ##########
-pred0 <- rep(0, length(Train[,1]))
+pred0 <- rep(0, length(Train1[,1]))
 lossDMC(true = Train1$fraud, 
         pred = pred0 )
 ## result: 520
@@ -112,17 +112,17 @@ mean(loss2)
 
 
 
-######################################  Train ###################################
+######################################  Train0 ###################################
 formula1 <- "fraud~."
 loss1 <- rep(0, 100)
 loss2 <- rep(0, 100)
 for (i in 1:100){
   pred1 <- pred0 
-  probs <- cv_logistic_probs(Train, formula1, 10)
+  probs <- cv_logistic_probs(Train0, formula1, 10)
   pred1[ which(  probs > 5/7  ) ] <- 1
-  loss1[i] <- lossDMC(true = Train$fraud, 
+  loss1[i] <- lossDMC(true = Train0$fraud, 
                       pred = pred1)
-  loss2[i] <- sum(pred1!=Train$fraud)
+  loss2[i] <- sum(pred1!=Train0$fraud)
 }
 
 mean(loss1)
@@ -143,7 +143,7 @@ pred_final <- pred0
 pred_final[which(fit_final$fitted.values>5/7)] <- 1
 
 ## train loss
-lossDMC(true = Train$fraud, 
+lossDMC(true = Train1$fraud, 
         pred = pred_final)
 sum(pred_final!=Train1$fraud)
 
