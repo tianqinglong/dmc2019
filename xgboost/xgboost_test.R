@@ -2,7 +2,7 @@ rm(list=ls())
 library(xgboost)
 
 
-#setwd('/Users/lululu/Documents/WYY/Graduate2019Spring/STAT602/DMC')
+setwd('/Users/lululu/Documents/WYY/Graduate2019Spring/STAT602/DMC')
 train.dat = read.csv('DMC_2019_task/train.csv',header=TRUE,sep='|')
 test.dat = read.csv('DMC_2019_task/test.csv',header=TRUE,sep='|')
 names(train.dat)
@@ -10,6 +10,7 @@ names(train.dat)
 #train.dat$fraud <- as.factor(train.dat$fraud)
 #test.dat$trustLevel <- as.factor(test.dat$trustLevel)
 
+train.dat = cbind(train.dat, total.item=train.dat$totalScanTimeInSeconds*train.dat$scannedLineItemsPerSecond)
 train.xg = list(data = as.matrix(train.dat[-10]),label = train.dat$fraud)
 bst1 = xgboost(data = train.xg$data,label = train.xg$label,
              max_depth = 5,nrounds = 3,objective = 'binary:logistic')
@@ -38,9 +39,9 @@ CV.xgb <- function(xg.dat,nfold,thres){
     }else if (i  == nfold){
       ind.test = ind.all[((i-1)*fsize+1):Nobs]
     }
-    train.foldi = list(data  =  as.matrix(xg.dat$dat[-ind.test,]), 
+    train.foldi = list(data  =  as.matrix(xg.dat$dat[-ind.test,]),
                      label  =  xg.dat$label[-ind.test])
-    test.foldi = list(data = as.matrix(xg.dat$dat[ind.test,]), 
+    test.foldi = list(data = as.matrix(xg.dat$dat[ind.test,]),
                     label = xg.dat$label[ind.test])
     bst.foldi = xgboost(data = train.foldi$data,label = train.foldi$label,
                       max_depth = 5,nrounds = 20,objective = 'binary:logistic')
@@ -60,4 +61,9 @@ CV.fit$loss_fraud
 CV.fit$loss_01
 
 rep.cv = replicate(100,CV.xgb(xg.dat=train.xg,nfold=10,thres=5/7))
-mean(unlist(rep.cv[3,]))
+mean(unlist(lapply(rep.cv[4,],'[[',2)))
+
+
+
+
+
