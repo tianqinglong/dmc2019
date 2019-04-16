@@ -1,49 +1,12 @@
-library(caret)
 library(tidyverse)
+library(caret)
+library(h2o)
 
 train <- read.csv("train.csv", sep = "|")
 train %>% mutate(
   fraud = as.factor(fraud),
   totalItems = totalScanTimeInSeconds * scannedLineItemsPerSecond
 ) -> train
-
-# features <- setdiff(names(train), "fraud")
-# x <- train[, features]
-# y <- train$fraud
-# 
-# train_control <- trainControl(
-#   method = "cv",
-#   number = 5
-#   )
-# 
-# nb.m1 <- train(
-#   x = x,
-#   y = y,
-#   method = "nb"
-#   )
-# 
-# confusionMatrix(nb.m1)
-# 
-# search_grid <- expand.grid(
-#   usekernel = c(TRUE, FALSE),
-#   adjust = seq(0, 5, by = 1),
-#   fL = seq(0, 5, by = 1)
-# )
-# 
-# nb.m2 <- train(
-#   x = x,
-#   y = y,
-#   method = "nb",
-#   trControl = train_control,
-#   tuneGrid = search_grid,
-#   preProc = c("BoxCox", "center", "scale", "pca")
-# )
-# 
-# nb.m2$results %>% 
-#   top_n(5, wt = Accuracy) %>%
-#   arrange(desc(Accuracy))
-
-# h2o
 
 h2o.no_progress()
 h2o.init()
@@ -60,8 +23,6 @@ nb.h2o <- h2o.naiveBayes(
   laplace = 0
 )
 h2o.confusionMatrix(nb.h2o)
-
-
 
 preprocess <- preProcess(train, method = c("BoxCox",
                                            "center",
